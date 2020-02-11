@@ -4,23 +4,44 @@
 -- Project :      SistemaInsumos1.1.dm1
 -- Author :       Facundo
 --
--- Date Created : Tuesday, February 04, 2020 20:47:23
+-- Date Created : Tuesday, February 11, 2020 18:13:45
 -- Target DBMS : MySQL 5.x
 --
 
+DROP TABLE Clientes
+;
+DROP TABLE Compras
+;
+DROP TABLE ComprasProductos
+;
+DROP TABLE Empleados
+;
+DROP TABLE Personas
+;
+DROP TABLE Productos
+;
+DROP TABLE Proveedores
+;
+DROP TABLE Roles
+;
+DROP TABLE Rubros
+;
+DROP TABLE Ventas
+;
+DROP TABLE VentasProductos
+;
 -- 
 -- TABLE: Clientes 
 --
 
 CREATE TABLE Clientes(
-    Id_Cliente    INT             NOT NULL,
-    Apellidos     VARCHAR(30)     NOT NULL,
-    Email         VARCHAR(120)    NOT NULL,
-    PRIMARY KEY (Id_Cliente)
+    IdCliente    INT             NOT NULL,
+    Apellidos    VARCHAR(30)     NOT NULL,
+    Email        VARCHAR(120)    NOT NULL,
+    PRIMARY KEY (IdCliente)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema  los clientes de la tienda  que vende insumos de computación.'
 ;
-
-
 
 -- 
 -- TABLE: Compras 
@@ -33,9 +54,8 @@ CREATE TABLE Compras(
     FechaCompra    DATETIME    NOT NULL,
     PRIMARY KEY (IdCompra, IdEmpleado, IdProveedor)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema  las compras  realizadas por los empleados a los proveedores.'
 ;
-
-
 
 -- 
 -- TABLE: ComprasProductos 
@@ -51,9 +71,8 @@ CREATE TABLE ComprasProductos(
     CantidadCompra    SMALLINT          NOT NULL,
     PRIMARY KEY (IdCompra, IdProducto, IdEmpleado, IdProveedor, IdRubro)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema los productos  que se adquirieron en  una compra .'
 ;
-
-
 
 -- 
 -- TABLE: Empleados 
@@ -68,9 +87,8 @@ CREATE TABLE Empleados(
     FechaIngreso    DATETIME       NOT NULL,
     PRIMARY KEY (IdEmpleado)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema  los empleados de la tienda  que vende insumos de computación.'
 ;
-
-
 
 -- 
 -- TABLE: Personas 
@@ -83,9 +101,8 @@ CREATE TABLE Personas(
     EstadoPer     CHAR(1)        DEFAULT 'A' NOT NULL,
     PRIMARY KEY (IdPersonas)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena las personas participantes del sistema.'
 ;
-
-
 
 -- 
 -- TABLE: Productos 
@@ -99,9 +116,8 @@ CREATE TABLE Productos(
     EstadoProd        CHAR(1)           NOT NULL,
     PRIMARY KEY (IdProducto, IdRubro)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena   en el sistema. los productos  se puede adquierir en  la tienda .'
 ;
-
-
 
 -- 
 -- TABLE: Proveedores 
@@ -111,9 +127,8 @@ CREATE TABLE Proveedores(
     IdProveedor    INT    NOT NULL,
     PRIMARY KEY (IdProveedor)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema los proveedores  de la tienda de ventas de insumos de computación .'
 ;
-
-
 
 -- 
 -- TABLE: Roles 
@@ -125,9 +140,8 @@ CREATE TABLE Roles(
     TipoRol    VARCHAR(30)    NOT NULL,
     PRIMARY KEY (IdRol)
 )ENGINE=INNODB
+COMMENT='Tabla del sistema que almacena los roles de los  empleados de la tienda de venta de insumos.'
 ;
-
-
 
 -- 
 -- TABLE: Rubros 
@@ -139,9 +153,8 @@ CREATE TABLE Rubros(
     EstadoRubro    CHAR(1)        DEFAULT 'A' NOT NULL,
     PRIMARY KEY (IdRubro)
 )ENGINE=INNODB
+COMMENT='Tabla del sistema que almacena los rubros de los  productos que se puede adquirir en la tienda .'
 ;
-
-
 
 -- 
 -- TABLE: Ventas 
@@ -149,14 +162,13 @@ CREATE TABLE Rubros(
 
 CREATE TABLE Ventas(
     IdVenta       BIGINT      AUTO_INCREMENT,
-    Id_Cliente    INT         NOT NULL,
+    IdCliente     INT         NOT NULL,
     IdEmpleado    INT         NOT NULL,
     FechaVenta    DATETIME    NOT NULL,
-    PRIMARY KEY (IdVenta, Id_Cliente, IdEmpleado)
+    PRIMARY KEY (IdVenta, IdCliente, IdEmpleado)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema  las ventas realizadas por los empleados a los clientes.'
 ;
-
-
 
 -- 
 -- TABLE: VentasProductos 
@@ -173,16 +185,27 @@ CREATE TABLE VentasProductos(
     Descuento        DECIMAL(30, 0)    NOT NULL,
     PRIMARY KEY (IdVenta, IdProducto, Id_Cliente, IdEmpleado, IdRubro)
 )ENGINE=INNODB
+COMMENT='Tabla que almacena en el sistema los productos  que se adquirieron en  una venta.'
 ;
 
+-- 
+-- INDEX: UI_Email 
+--
 
+CREATE UNIQUE INDEX UI_Email ON Clientes(Email)
+;
+-- 
+-- INDEX: IX_ApellidosClientes 
+--
 
+CREATE INDEX IX_ApellidosClientes ON Clientes(Apellidos)
+;
 -- 
 -- TABLE: Clientes 
 --
 
-ALTER TABLE Clientes ADD CONSTRAINT RefPersonas4 
-    FOREIGN KEY (Id_Cliente)
+ALTER TABLE Clientes ADD CONSTRAINT RefPersonas41 
+    FOREIGN KEY (IdCliente)
     REFERENCES Personas(IdPersonas)
 ;
 
@@ -191,12 +214,12 @@ ALTER TABLE Clientes ADD CONSTRAINT RefPersonas4
 -- TABLE: Compras 
 --
 
-ALTER TABLE Compras ADD CONSTRAINT RefProveedores7 
+ALTER TABLE Compras ADD CONSTRAINT RefProveedores71 
     FOREIGN KEY (IdProveedor)
     REFERENCES Proveedores(IdProveedor)
 ;
 
-ALTER TABLE Compras ADD CONSTRAINT RefEmpleados8 
+ALTER TABLE Compras ADD CONSTRAINT RefEmpleados81 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Empleados(IdEmpleado)
 ;
@@ -206,12 +229,12 @@ ALTER TABLE Compras ADD CONSTRAINT RefEmpleados8
 -- TABLE: ComprasProductos 
 --
 
-ALTER TABLE ComprasProductos ADD CONSTRAINT RefCompras23 
+ALTER TABLE ComprasProductos ADD CONSTRAINT RefCompras231 
     FOREIGN KEY (IdCompra, IdEmpleado, IdProveedor)
     REFERENCES Compras(IdCompra, IdEmpleado, IdProveedor)
 ;
 
-ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos24 
+ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos241 
     FOREIGN KEY (IdProducto, IdRubro)
     REFERENCES Productos(IdProducto, IdRubro)
 ;
@@ -221,12 +244,12 @@ ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos24
 -- TABLE: Empleados 
 --
 
-ALTER TABLE Empleados ADD CONSTRAINT RefPersonas2 
+ALTER TABLE Empleados ADD CONSTRAINT RefPersonas21 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Personas(IdPersonas)
 ;
 
-ALTER TABLE Empleados ADD CONSTRAINT RefRoles9 
+ALTER TABLE Empleados ADD CONSTRAINT RefRoles91 
     FOREIGN KEY (IdRol)
     REFERENCES Roles(IdRol)
 ;
@@ -236,7 +259,7 @@ ALTER TABLE Empleados ADD CONSTRAINT RefRoles9
 -- TABLE: Productos 
 --
 
-ALTER TABLE Productos ADD CONSTRAINT RefRubros27 
+ALTER TABLE Productos ADD CONSTRAINT RefRubros271 
     FOREIGN KEY (IdRubro)
     REFERENCES Rubros(IdRubro)
 ;
@@ -246,7 +269,7 @@ ALTER TABLE Productos ADD CONSTRAINT RefRubros27
 -- TABLE: Proveedores 
 --
 
-ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas1 
+ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas11 
     FOREIGN KEY (IdProveedor)
     REFERENCES Personas(IdPersonas)
 ;
@@ -256,12 +279,12 @@ ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas1
 -- TABLE: Ventas 
 --
 
-ALTER TABLE Ventas ADD CONSTRAINT RefClientes10 
-    FOREIGN KEY (Id_Cliente)
-    REFERENCES Clientes(Id_Cliente)
+ALTER TABLE Ventas ADD CONSTRAINT RefClientes101 
+    FOREIGN KEY (IdCliente)
+    REFERENCES Clientes(IdCliente)
 ;
 
-ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados11 
+ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados111 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Empleados(IdEmpleado)
 ;
@@ -271,12 +294,12 @@ ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados11
 -- TABLE: VentasProductos 
 --
 
-ALTER TABLE VentasProductos ADD CONSTRAINT RefVentas25 
+ALTER TABLE VentasProductos ADD CONSTRAINT RefVentas251 
     FOREIGN KEY (IdVenta, Id_Cliente, IdEmpleado)
-    REFERENCES Ventas(IdVenta, Id_Cliente, IdEmpleado)
+    REFERENCES Ventas(IdVenta, IdCliente, IdEmpleado)
 ;
 
-ALTER TABLE VentasProductos ADD CONSTRAINT RefProductos26 
+ALTER TABLE VentasProductos ADD CONSTRAINT RefProductos261 
     FOREIGN KEY (IdProducto, IdRubro)
     REFERENCES Productos(IdProducto, IdRubro)
 ;
