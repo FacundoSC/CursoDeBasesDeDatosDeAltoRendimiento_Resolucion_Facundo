@@ -4,32 +4,10 @@
 -- Project :      SistemaInsumos1.1.dm1
 -- Author :       Facundo
 --
--- Date Created : Tuesday, February 11, 2020 18:13:45
+-- Date Created : Wednesday, February 12, 2020 17:26:02
 -- Target DBMS : MySQL 5.x
 --
 
-DROP TABLE Clientes
-;
-DROP TABLE Compras
-;
-DROP TABLE ComprasProductos
-;
-DROP TABLE Empleados
-;
-DROP TABLE Personas
-;
-DROP TABLE Productos
-;
-DROP TABLE Proveedores
-;
-DROP TABLE Roles
-;
-DROP TABLE Rubros
-;
-DROP TABLE Ventas
-;
-DROP TABLE VentasProductos
-;
 -- 
 -- TABLE: Clientes 
 --
@@ -177,13 +155,13 @@ COMMENT='Tabla que almacena en el sistema  las ventas realizadas por los emplead
 CREATE TABLE VentasProductos(
     IdVenta          BIGINT            NOT NULL,
     IdProducto       SMALLINT          NOT NULL,
-    Id_Cliente       INT               NOT NULL,
+    IdCliente        INT               NOT NULL,
     IdEmpleado       INT               NOT NULL,
     IdRubro          TINYINT           NOT NULL,
     PrecioVenta      DECIMAL(10, 0)    NOT NULL,
     CantidadVenta    SMALLINT          NOT NULL,
     Descuento        DECIMAL(30, 0)    NOT NULL,
-    PRIMARY KEY (IdVenta, IdProducto, Id_Cliente, IdEmpleado, IdRubro)
+    PRIMARY KEY (IdVenta, IdProducto, IdCliente, IdEmpleado, IdRubro)
 )ENGINE=INNODB
 COMMENT='Tabla que almacena en el sistema los productos  que se adquirieron en  una venta.'
 ;
@@ -201,10 +179,154 @@ CREATE UNIQUE INDEX UI_Email ON Clientes(Email)
 CREATE INDEX IX_ApellidosClientes ON Clientes(Apellidos)
 ;
 -- 
+-- INDEX: Ref24 
+--
+
+CREATE INDEX Ref24 ON Clientes(IdCliente)
+;
+-- 
+-- INDEX: UI_IdCompra 
+--
+
+CREATE UNIQUE INDEX UI_IdCompra ON Compras(IdCompra)
+;
+-- 
+-- INDEX: IX_FechaCompra 
+--
+
+CREATE INDEX IX_FechaCompra ON Compras(FechaCompra)
+;
+-- 
+-- INDEX: Ref37 
+--
+
+CREATE INDEX Ref37 ON Compras(IdProveedor)
+;
+-- 
+-- INDEX: Ref48 
+--
+
+CREATE INDEX Ref48 ON Compras(IdEmpleado)
+;
+-- 
+-- INDEX: Ref823 
+--
+
+CREATE INDEX Ref823 ON ComprasProductos(IdProveedor, IdEmpleado, IdCompra)
+;
+-- 
+-- INDEX: Ref1124 
+--
+
+CREATE INDEX Ref1124 ON ComprasProductos(IdProducto, IdRubro)
+;
+-- 
+-- INDEX: UI_Usuario 
+--
+
+CREATE UNIQUE INDEX UI_Usuario ON Empleados(Usuario)
+;
+-- 
+-- INDEX: IX_Apellidos 
+--
+
+CREATE INDEX IX_Apellidos ON Empleados(Apellidos)
+;
+-- 
+-- INDEX: Ref22 
+--
+
+CREATE INDEX Ref22 ON Empleados(IdEmpleado)
+;
+-- 
+-- INDEX: Ref99 
+--
+
+CREATE INDEX Ref99 ON Empleados(IdRol)
+;
+-- 
+-- INDEX: IX_Nombres 
+--
+
+CREATE INDEX IX_Nombres ON Personas(Nombres)
+;
+-- 
+-- INDEX: UI_IdProducto 
+--
+
+CREATE UNIQUE INDEX UI_IdProducto ON Productos(IdProducto)
+;
+-- 
+-- INDEX: UI_NombreProducto 
+--
+
+CREATE UNIQUE INDEX UI_NombreProducto ON Productos(NombreProducto)
+;
+-- 
+-- INDEX: Ref1627 
+--
+
+CREATE INDEX Ref1627 ON Productos(IdRubro)
+;
+-- 
+-- INDEX: Ref21 
+--
+
+CREATE INDEX Ref21 ON Proveedores(IdProveedor)
+;
+-- 
+-- INDEX: UI_RolTipoRol 
+--
+
+CREATE UNIQUE INDEX UI_RolTipoRol ON Roles(Rol, TipoRol)
+;
+-- 
+-- INDEX: UI_NombreRubro 
+--
+
+CREATE UNIQUE INDEX UI_NombreRubro ON Rubros(NombreRubro)
+;
+-- 
+-- INDEX: UI_IdVenta 
+--
+
+CREATE UNIQUE INDEX UI_IdVenta ON Ventas(IdVenta)
+;
+-- 
+-- INDEX: IX_FechaVenta 
+--
+
+CREATE INDEX IX_FechaVenta ON Ventas(FechaVenta)
+;
+-- 
+-- INDEX: Ref710 
+--
+
+CREATE INDEX Ref710 ON Ventas(IdCliente)
+;
+-- 
+-- INDEX: Ref411 
+--
+
+CREATE INDEX Ref411 ON Ventas(IdEmpleado)
+;
+-- 
+-- INDEX: Ref1025 
+--
+
+CREATE INDEX Ref1025 ON VentasProductos(IdEmpleado, IdCliente, IdVenta)
+;
+-- 
+-- INDEX: Ref1126 
+--
+
+CREATE INDEX Ref1126 ON VentasProductos(IdProducto, IdRubro)
+;
+-- 
 -- TABLE: Clientes 
 --
 
-ALTER TABLE Clientes ADD CONSTRAINT RefPersonas41 
+ALTER TABLE Clientes ADD CONSTRAINT RefPersonas43 
     FOREIGN KEY (IdCliente)
     REFERENCES Personas(IdPersonas)
 ;
@@ -214,12 +336,12 @@ ALTER TABLE Clientes ADD CONSTRAINT RefPersonas41
 -- TABLE: Compras 
 --
 
-ALTER TABLE Compras ADD CONSTRAINT RefProveedores71 
+ALTER TABLE Compras ADD CONSTRAINT RefProveedores73 
     FOREIGN KEY (IdProveedor)
     REFERENCES Proveedores(IdProveedor)
 ;
 
-ALTER TABLE Compras ADD CONSTRAINT RefEmpleados81 
+ALTER TABLE Compras ADD CONSTRAINT RefEmpleados83 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Empleados(IdEmpleado)
 ;
@@ -229,12 +351,12 @@ ALTER TABLE Compras ADD CONSTRAINT RefEmpleados81
 -- TABLE: ComprasProductos 
 --
 
-ALTER TABLE ComprasProductos ADD CONSTRAINT RefCompras231 
+ALTER TABLE ComprasProductos ADD CONSTRAINT RefCompras233 
     FOREIGN KEY (IdCompra, IdEmpleado, IdProveedor)
     REFERENCES Compras(IdCompra, IdEmpleado, IdProveedor)
 ;
 
-ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos241 
+ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos243 
     FOREIGN KEY (IdProducto, IdRubro)
     REFERENCES Productos(IdProducto, IdRubro)
 ;
@@ -244,12 +366,12 @@ ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos241
 -- TABLE: Empleados 
 --
 
-ALTER TABLE Empleados ADD CONSTRAINT RefPersonas21 
+ALTER TABLE Empleados ADD CONSTRAINT RefPersonas23 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Personas(IdPersonas)
 ;
 
-ALTER TABLE Empleados ADD CONSTRAINT RefRoles91 
+ALTER TABLE Empleados ADD CONSTRAINT RefRoles93 
     FOREIGN KEY (IdRol)
     REFERENCES Roles(IdRol)
 ;
@@ -259,7 +381,7 @@ ALTER TABLE Empleados ADD CONSTRAINT RefRoles91
 -- TABLE: Productos 
 --
 
-ALTER TABLE Productos ADD CONSTRAINT RefRubros271 
+ALTER TABLE Productos ADD CONSTRAINT RefRubros273 
     FOREIGN KEY (IdRubro)
     REFERENCES Rubros(IdRubro)
 ;
@@ -269,7 +391,7 @@ ALTER TABLE Productos ADD CONSTRAINT RefRubros271
 -- TABLE: Proveedores 
 --
 
-ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas11 
+ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas13 
     FOREIGN KEY (IdProveedor)
     REFERENCES Personas(IdPersonas)
 ;
@@ -279,12 +401,12 @@ ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas11
 -- TABLE: Ventas 
 --
 
-ALTER TABLE Ventas ADD CONSTRAINT RefClientes101 
+ALTER TABLE Ventas ADD CONSTRAINT RefClientes103 
     FOREIGN KEY (IdCliente)
     REFERENCES Clientes(IdCliente)
 ;
 
-ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados111 
+ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados113 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Empleados(IdEmpleado)
 ;
@@ -294,12 +416,12 @@ ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados111
 -- TABLE: VentasProductos 
 --
 
-ALTER TABLE VentasProductos ADD CONSTRAINT RefVentas251 
-    FOREIGN KEY (IdVenta, Id_Cliente, IdEmpleado)
+ALTER TABLE VentasProductos ADD CONSTRAINT RefVentas253 
+    FOREIGN KEY (IdVenta, IdCliente, IdEmpleado)
     REFERENCES Ventas(IdVenta, IdCliente, IdEmpleado)
 ;
 
-ALTER TABLE VentasProductos ADD CONSTRAINT RefProductos261 
+ALTER TABLE VentasProductos ADD CONSTRAINT RefProductos263 
     FOREIGN KEY (IdProducto, IdRubro)
     REFERENCES Productos(IdProducto, IdRubro)
 ;
