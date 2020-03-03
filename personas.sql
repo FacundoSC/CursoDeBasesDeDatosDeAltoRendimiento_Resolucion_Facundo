@@ -1,3 +1,4 @@
+
 insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (1, 'Aurelea', '8495260912', 'A');
 insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (2, 'Faydra', '7004161197', 'A');
 insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (3, 'Osgood', '5248337355', 'A');
@@ -28,3 +29,23 @@ insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (27, 'Ade
 insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (28, 'Waylon', '4329673188', 'A');
 insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (29, 'Chris', '7919615305', 'A');
 insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (30, 'Willabella', '6996544094', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (31, 'Botsford-Terry', '7017009318', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (32, 'Crona, Kiehn and Schumm', '6233018685', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (33, 'Satterfield-Bartell', '5326254966', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (34, 'Waelchi-Sanford', '1875369767', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (35, 'Kuhlman Group', '8528063007', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (36, 'Runolfsson-Maggio', '4042857415', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (37, 'Hoppe, Bergnaum and Farrell', '1409123428', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (38, 'Crist LLC', '3045162274', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (39, 'White-Romaguera', '8464622579', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (40, 'Homenick and Sons', '1912705510', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (41, 'Sawayn-Zemlak', '2632220538', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (42, 'Fahey-Pfeffer', '2502974002', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (43, 'Smitham-Howell', '6909740027', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (44, 'Schimmel-Gulgowski', '6118324703', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (45, 'Padberg-Pacocha', '5796276432', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (46, 'O''Conner LLC', '7117869541', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (47, 'Cormier and Sons', '1722423421', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (48, 'Grady Inc', '8534888986', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (49, 'Mosciski, Metz and Mosciski', '3113270565', 'A');
+insert into personas (IdPersonas, Nombres, Telefono, EstadoPer) values (50, 'Cartwright Group', '6233913065', 'A');
