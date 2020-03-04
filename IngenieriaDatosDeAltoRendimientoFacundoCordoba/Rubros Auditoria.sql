@@ -78,3 +78,6 @@ UPDATE `svic`.`Rubros` SET `NombreRubro` = 'Raton'
 WHERE (`IdRubro` = '8');
 
 SELECT * FROM aud_Rubros;
+
+
+SELECT CP.CantidadCompra FROM Productos As Pro JOIN Comprasproductos AS CP on Pro.IdProducto=CP.IdProducto
