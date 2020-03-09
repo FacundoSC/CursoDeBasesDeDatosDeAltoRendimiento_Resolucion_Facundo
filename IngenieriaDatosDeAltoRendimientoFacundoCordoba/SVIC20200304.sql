@@ -397,7 +397,7 @@ CREATE TABLE `compras` (
   KEY `Ref48` (`IdEmpleado`),
   CONSTRAINT `RefEmpleados83` FOREIGN KEY (`IdEmpleado`) REFERENCES `empleados` (`IdEmpleado`),
   CONSTRAINT `RefProveedores73` FOREIGN KEY (`IdProveedor`) REFERENCES `proveedores` (`IdProveedor`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Tabla que almacena en el sistema  las compras  realizadas por los empleados a los proveedores.';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='Tabla que almacena en el sistema  las compras  realizadas por los empleados a los proveedores.';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -406,6 +406,7 @@ CREATE TABLE `compras` (
 
 LOCK TABLES `compras` WRITE;
 /*!40000 ALTER TABLE `compras` DISABLE KEYS */;
+INSERT INTO `compras` VALUES (1,21,36,'2020-03-04 07:52:15');
 /*!40000 ALTER TABLE `compras` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1187,6 +1188,61 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_alta_compra` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_alta_compra`(pIdEmpleado int,pIdProveedor int,pFechaCompra datetime)
+SALIR:BEGIN
+	/*
+    Permite dar de alta una compra controlando que el nombre no exista ya. 
+    La da de alta al final del orden, con estado A: Activa. 
+    Devuelve OK o el mensaje de error en Mensaje.
+    */
+	-- Manejo de error en la transacción
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		 SHOW ERRORS;
+		SELECT 'Error en la transacción. Contáctese con el administrador.' Mensaje,
+				NULL AS Id;
+		ROLLBACK;
+	END;
+
+    -- Controla que exista el empleado en la tabla empleados
+	IF NOT EXISTS(SELECT IdEmpleado FROM Empleados WHERE IdEmpleado = pIdEmpleado) THEN
+		SELECT 'Empleado inexistente' AS Mensaje;
+		LEAVE SALIR;
+    END IF;
+    
+-- Controla que exista el proveedor en la tabla proveedores
+	IF NOT EXISTS(SELECT IdProveedor FROM Proveedores WHERE IdProveedor = pIdProveedor) THEN
+		SELECT 'Proveedor inexistente' AS Mensaje;
+		LEAVE SALIR;
+    END IF;
+     -- Controla que la fecha sea obligatoria
+	IF pFechaCompra = '' OR pFechaCompra IS NULL THEN
+		SELECT 'Debe proveer una fecha para registrar la compra' AS Mensaje, NULL AS Id;
+		LEAVE SALIR;
+    END IF;
+    
+	START TRANSACTION;
+		
+
+		INSERT INTO Compras VALUES(LAST_INSERT_ID(), pIdEmpleado, pIdProveedor,pFechaCompra);
+        SELECT 'OK' AS Mensaje;
+    COMMIT;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!50003 DROP PROCEDURE IF EXISTS `ssp_alta_empleado` */;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -1573,6 +1629,158 @@ SALIR:BEGIN
     COMMIT;
     
 
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_autocompletar_clientes` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_autocompletar_clientes`(
+								pCadena varchar(60), pIncluyeBajas char(1))
+BEGIN
+	/*
+    Permite listar todos los rubros que cumplan con la condición de 
+    autocompletar de la cadena de búsqueda que coincida con el nombre de 
+    el rubro. Puede o no incluir los rubros dadas de baja según 
+    pIncluyeBajas (S: Si - N: No). Busca a partir del cuarto caracter y 
+    ordena por nombre.
+	*/
+    SELECT * FROM Personas AS Per JOIN Clientes AS Cli ON Per.IdPersonas=Cli.IdCliente AND Cli.Apellidos LIKE CONCAT('%',pCadena,'%') AND
+				(pIncluyeBajas = 'S' OR (pIncluyeBajas = 'N' AND Per.EstadoPer = 'A')) AND
+				CHAR_LENGTH(pCadena) > 3
+	ORDER BY	Cli.Apellidos;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_autocompletar_empleados` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_autocompletar_empleados`(
+								pCadena varchar(60), pIncluyeBajas char(1))
+BEGIN
+	/*
+    Permite listar todos los empleados que cumplan con la condición de 
+    autocompletar de la cadena de búsqueda que coincida con el apellido del empleado. Puede o no incluir los rubros dadas de baja según 
+    pIncluyeBajas (S: Si - N: No). Busca a partir del cuarto caracter y 
+    ordena por apellido.
+	*/
+    SELECT * FROM Personas AS Per JOIN Empleados AS Emp ON Per.IdPersonas= Emp.IdEmpleado AND Emp.Apellidos LIKE CONCAT('%',pCadena,'%') AND
+				(pIncluyeBajas = 'S' OR (pIncluyeBajas = 'N' AND Per.EstadoPer = 'A')) AND
+				CHAR_LENGTH(pCadena) > 3
+	ORDER BY	Emp.Apellidos;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_autocompletar_productos` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_autocompletar_productos`(
+								pCadena varchar(60), pIncluyeBajas char(1))
+BEGIN
+	/*
+    Permite listar todos las productos que cumplan con la condición de 
+    autocompletar de la cadena de búsqueda que coincida con el nombre de 
+    el producto. Puede o no incluir los productos dados de baja según 
+    pIncluyeBajas (S: Si - N: No). Busca a partir del cuarto caracter y 
+    ordena por nombre.
+	*/
+    SELECT		*
+    FROM		productos
+    WHERE		NombreProducto LIKE CONCAT('%',pCadena,'%') AND
+				(pIncluyeBajas = 'S' OR (pIncluyeBajas = 'N' AND EstadoProd = 'A')) AND
+				CHAR_LENGTH(pCadena) > 3
+	ORDER BY	NombreProducto;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_autocompletar_proveedores` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_autocompletar_proveedores`(
+								pCadena varchar(60), pIncluyeBajas char(1))
+BEGIN
+	/*
+    Permite listar todos los empleados que cumplan con la condición de 
+    autocompletar de la cadena de búsqueda que coincida con el apellido del empleado. Puede o no incluir los rubros dadas de baja según 
+    pIncluyeBajas (S: Si - N: No). Busca a partir del cuarto caracter y 
+    ordena por apellido.
+	*/
+    SELECT * FROM Personas AS Per JOIN Proveedores AS Pro ON Per.IdPersonas= Pro.IdProveedor AND Per.Nombres LIKE CONCAT('%',pCadena,'%') AND
+				(pIncluyeBajas = 'S' OR (pIncluyeBajas = 'N' AND Per.EstadoPer = 'A')) AND
+				CHAR_LENGTH(pCadena) > 3
+	ORDER BY	Per.Nombres;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_autocompletar_rubros` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_autocompletar_rubros`(
+								pCadena varchar(60), pIncluyeBajas char(1))
+BEGIN
+	/*
+    Permite listar todos los rubros que cumplan con la condición de 
+    autocompletar de la cadena de búsqueda que coincida con el nombre de 
+    el rubro. Puede o no incluir los rubros dadas de baja según 
+    pIncluyeBajas (S: Si - N: No). Busca a partir del cuarto caracter y 
+    ordena por nombre.
+	*/
+    SELECT		*
+    FROM		Rubros
+    WHERE		NombreRubro LIKE CONCAT('%',pCadena,'%') AND
+				(pIncluyeBajas = 'S' OR (pIncluyeBajas = 'N' AND EstadoRubro = 'A')) AND
+				CHAR_LENGTH(pCadena) > 3
+	ORDER BY	NombreRubro;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -2039,6 +2247,40 @@ BEGIN
 	END;
 	SELECT Cli.IdCliente,Per.Nombres,Cli.Apellidos,Per.Telefono,Cli.Email,Per.EstadoPer
     FROM Personas AS Per JOIN Clientes AS Cli ON Per.IdPersonas = Cli.IdCliente;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `ssp_listar_empleados` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ssp_listar_empleados`()
+BEGIN
+ /*
+	Permite listar los empleados ordenados por el apellido.
+    
+ */
+  -- Manejo de error en la transacción
+	DECLARE EXIT HANDLER FOR SQLEXCEPTION
+	BEGIN
+		SHOW ERRORS;
+		SELECT 'Error en la transacción. Contáctese con el administrador.' Mensaje;
+		ROLLBACK;
+	END;
+  
+    SELECT *
+    FROM Personas AS Per JOIN Empleados AS Emp ON Per.IdPersonas = Emp.IdEmpleado;
+ 
 
 END ;;
 DELIMITER ;
@@ -2625,4 +2867,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-04  0:09:33
+-- Dump completed on 2020-03-04  8:38:23
