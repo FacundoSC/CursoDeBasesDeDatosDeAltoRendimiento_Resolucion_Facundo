@@ -33,6 +33,8 @@ DELIMITER ;
 
 INSERT INTO Rubros values(8,'mouse','A');
 
+call ssp_alta_rubro('disco duro ', 'facundoc', '192.168.2.1','firefox', 'SVIC');
+
 SELECT * FROM aud_Rubros;
 
 -- Trigger after delete
@@ -49,7 +51,9 @@ BEGIN
 END$$
 DELIMITER ;
 
-DELETE FROM Rubros WHERE IdRubro = 9;
+DELETE FROM Rubros WHERE IdRubro = 2;
+
+call ssp_borra_rubro(1, 'facundoc', '192.168.2.1','firefox', 'SVIC');
 
 SELECT * FROM aud_Rubros;
 
@@ -74,10 +78,15 @@ DELIMITER ;
 
 SELECT * FROM rubros;
 
-UPDATE `svic`.`Rubros` SET `NombreRubro` = 'Raton' 
-WHERE (`IdRubro` = '8');
+UPDATE `svic`.`Rubros` SET `NombreRubro` = 'mouse' 
+WHERE (`IdRubro` = '1');
 
 SELECT * FROM aud_Rubros;
 
+call ssp_listar_rubros();
+
+call ssp_modifica_rubro (1,'disco duro ', 'facundoc', '192.168.2.1','firefox', 'SVIC');
+
+call ssp_dame_rubro(1);
 
 SELECT CP.CantidadCompra FROM Productos As Pro JOIN Comprasproductos AS CP on Pro.IdProducto=CP.IdProducto

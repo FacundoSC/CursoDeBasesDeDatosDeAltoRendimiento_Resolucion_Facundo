@@ -1,0 +1,6 @@
+
+** Cambiar el nombre del proveedor de Inversion Entry -> Alternative Key  tanto en el modelo logico , el fisico y la base de datos
+
+ademas de agregar en la herramienta CASE para que impacte esto en el reporte .
+
+** Cambiar el nombre del campo password , al nombre contraseña de la tabla empleados porque es un valor reservado.
