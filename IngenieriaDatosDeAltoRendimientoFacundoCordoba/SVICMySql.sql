@@ -4,7 +4,7 @@
 -- Project :      SistemaInsumos1.1.dm1
 -- Author :       Facundo
 --
--- Date Created : Tuesday, March 17, 2020 19:28:23
+-- Date Created : Wednesday, March 25, 2020 19:00:03
 -- Target DBMS : MySQL 5.x
 --
 
@@ -62,7 +62,7 @@ CREATE TABLE Empleados(
     IdEmpleado      INT            NOT NULL,
     IdRol           TINYINT        NOT NULL,
     Usuario         VARCHAR(30)    NOT NULL,
-    Password        CHAR(32)       NOT NULL,
+    Contraseña      CHAR(32)       NOT NULL,
     FechaIngreso    DATETIME       NOT NULL,
     PRIMARY KEY (IdEmpleado)
 )ENGINE=INNODB
@@ -232,10 +232,10 @@ CREATE UNIQUE INDEX UI_NombreProducto ON Productos(NombreProducto)
 CREATE UNIQUE INDEX UI_IdProducto ON Productos(IdProducto)
 ;
 -- 
--- INDEX: IX_NombreProveedor 
+-- INDEX: UI_NombreProveedor 
 --
 
-CREATE INDEX IX_NombreProveedor ON Proveedores(NombreProveedor)
+CREATE UNIQUE INDEX UI_NombreProveedor ON Proveedores(NombreProveedor)
 ;
 -- 
 -- INDEX: UI_RolTipoRol 
@@ -265,7 +265,7 @@ CREATE INDEX IX_FechaVenta ON Ventas(FechaVenta)
 -- TABLE: Clientes 
 --
 
-ALTER TABLE Clientes ADD CONSTRAINT RefPersonasFisicas38 
+ALTER TABLE Clientes ADD CONSTRAINT RefPersonasFisicas382 
     FOREIGN KEY (IdCliente)
     REFERENCES PersonasFisicas(IdPersonaFisica)
 ;
@@ -275,12 +275,12 @@ ALTER TABLE Clientes ADD CONSTRAINT RefPersonasFisicas38
 -- TABLE: Compras 
 --
 
-ALTER TABLE Compras ADD CONSTRAINT RefProveedores7 
+ALTER TABLE Compras ADD CONSTRAINT RefProveedores72 
     FOREIGN KEY (IdProveedor)
     REFERENCES Proveedores(IdProveedor)
 ;
 
-ALTER TABLE Compras ADD CONSTRAINT RefEmpleados8 
+ALTER TABLE Compras ADD CONSTRAINT RefEmpleados82 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Empleados(IdEmpleado)
 ;
@@ -290,12 +290,12 @@ ALTER TABLE Compras ADD CONSTRAINT RefEmpleados8
 -- TABLE: ComprasProductos 
 --
 
-ALTER TABLE ComprasProductos ADD CONSTRAINT RefCompras23 
+ALTER TABLE ComprasProductos ADD CONSTRAINT RefCompras232 
     FOREIGN KEY (IdCompra, IdProveedor, IdEmpleado)
     REFERENCES Compras(IdCompra, IdProveedor, IdEmpleado)
 ;
 
-ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos24 
+ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos242 
     FOREIGN KEY (IdProducto, IdRubro)
     REFERENCES Productos(IdProducto, IdRubro)
 ;
@@ -305,14 +305,14 @@ ALTER TABLE ComprasProductos ADD CONSTRAINT RefProductos24
 -- TABLE: Empleados 
 --
 
-ALTER TABLE Empleados ADD CONSTRAINT RefRoles9 
-    FOREIGN KEY (IdRol)
-    REFERENCES Roles(IdRol)
-;
-
-ALTER TABLE Empleados ADD CONSTRAINT RefPersonasFisicas39 
+ALTER TABLE Empleados ADD CONSTRAINT RefPersonasFisicas392 
     FOREIGN KEY (IdEmpleado)
     REFERENCES PersonasFisicas(IdPersonaFisica)
+;
+
+ALTER TABLE Empleados ADD CONSTRAINT RefRoles92 
+    FOREIGN KEY (IdRol)
+    REFERENCES Roles(IdRol)
 ;
 
 
@@ -320,7 +320,7 @@ ALTER TABLE Empleados ADD CONSTRAINT RefPersonasFisicas39
 -- TABLE: PersonasFisicas 
 --
 
-ALTER TABLE PersonasFisicas ADD CONSTRAINT RefPersonas40 
+ALTER TABLE PersonasFisicas ADD CONSTRAINT RefPersonas402 
     FOREIGN KEY (IdPersonaFisica)
     REFERENCES Personas(IdPersonas)
 ;
@@ -330,7 +330,7 @@ ALTER TABLE PersonasFisicas ADD CONSTRAINT RefPersonas40
 -- TABLE: Productos 
 --
 
-ALTER TABLE Productos ADD CONSTRAINT RefRubros27 
+ALTER TABLE Productos ADD CONSTRAINT RefRubros272 
     FOREIGN KEY (IdRubro)
     REFERENCES Rubros(IdRubro)
 ;
@@ -340,7 +340,7 @@ ALTER TABLE Productos ADD CONSTRAINT RefRubros27
 -- TABLE: Proveedores 
 --
 
-ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas30 
+ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas302 
     FOREIGN KEY (IdProveedor)
     REFERENCES Personas(IdPersonas)
 ;
@@ -350,12 +350,12 @@ ALTER TABLE Proveedores ADD CONSTRAINT RefPersonas30
 -- TABLE: Ventas 
 --
 
-ALTER TABLE Ventas ADD CONSTRAINT RefClientes10 
+ALTER TABLE Ventas ADD CONSTRAINT RefClientes102 
     FOREIGN KEY (IdCliente)
     REFERENCES Clientes(IdCliente)
 ;
 
-ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados11 
+ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados112 
     FOREIGN KEY (IdEmpleado)
     REFERENCES Empleados(IdEmpleado)
 ;
@@ -365,12 +365,12 @@ ALTER TABLE Ventas ADD CONSTRAINT RefEmpleados11
 -- TABLE: VentasProductos 
 --
 
-ALTER TABLE VentasProductos ADD CONSTRAINT RefVentas25 
+ALTER TABLE VentasProductos ADD CONSTRAINT RefVentas252 
     FOREIGN KEY (IdVenta, IdCliente, IdEmpleado)
     REFERENCES Ventas(IdVenta, IdCliente, IdEmpleado)
 ;
 
-ALTER TABLE VentasProductos ADD CONSTRAINT RefProductos26 
+ALTER TABLE VentasProductos ADD CONSTRAINT RefProductos262 
     FOREIGN KEY (IdProducto, IdRubro)
     REFERENCES Productos(IdProducto, IdRubro)
 ;
